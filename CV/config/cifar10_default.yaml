@@ -1,0 +1,9 @@
+iter_num: 5
+add_ratio_per_iter: 0.05
+diff_threshold_ratio: 0.02
+
+early_stop_threshold: 3
+try_num_limits: 400
+add_num_decay_rate: 0.5
+add_num_decay_method: triggered
+add_num_decay_stage:

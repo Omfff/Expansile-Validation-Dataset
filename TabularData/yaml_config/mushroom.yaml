@@ -1,0 +1,32 @@
+file_path: ../datasets/mushrooms.csv
+test_ratio: 0.2
+model: xgb
+model_params:
+  max_depth: 4
+  learning_rate: 0.1
+  n_estimators: 50
+#  verbosity: 0
+#  subsample: 1
+#  colsample_bytree: 1
+#  scale_pos_weight: 1
+  use_label_encoder: false
+  n_jobs: 24 # 32
+
+val_ratio: 0.2
+coreset_val_ratio: 0.7
+repeat_j: 1
+val_method:
+k: 1
+
+val_aug_iter_num: 10
+add_ratio_per_iter: 0.1
+diff_threshold_ratio: 0.02
+aug_method: SMOTE
+aug_sample_method: RS
+early_stop_threshold: 2
+try_num_limits: 100
+add_num_decay_rate: 0.5
+add_num_decay_method:
+add_num_decay_stage:
+
+cal_distribution: false
