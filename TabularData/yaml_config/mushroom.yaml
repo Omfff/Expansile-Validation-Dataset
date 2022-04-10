@@ -1,4 +1,4 @@
-file_path: ../datasets/mushrooms.csv
+file_path: ./datasets/mushrooms.csv
 test_ratio: 0.2
 model: xgb
 model_params:

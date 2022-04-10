@@ -1,6 +1,3 @@
-import pandas as pd
-import tqdm
-from nlpaug.util.file.download import DownloadUtil
 from feature_distribution import FeatureDistribution
 from datasets import Dataset
 import copy
@@ -114,10 +111,6 @@ class DataExtender(object):
         return result
 
     def generate_data_to_pool(self, cache_files, process_func, *args):
-        # self.data_pool = self.split_set_by_class(self.train_set)
-        # for l in self.label_set:
-        #     self.data_pool[l].set_format('torch')
-        # return
         if cache_files is not None:
             pool_set = load_dataset('csv', data_files=cache_files)['train']
             for l in self.label_set:
@@ -280,31 +273,6 @@ class DataExtender(object):
         return val_set, curr_val_set_fd, is_finished, total_tries
 
 
-def download():
-    # DownloadUtil.download_word2vec(dest_dir='/home/omf/.cache/nlpaug/model/') # Download word2vec model
-    # DownloadUtil.download_glove(model_name='glove.6B', dest_dir='/home/omf/.cache/nlpaug/model/') # Download GloVe model
-    DownloadUtil.download_fasttext(model_name='wiki-news-300d-1M', dest_dir='/home/omf/.cache/nlpaug/model/')
-
-
-if __name__ == '__main__':
-    def data_extender_test():
-        device="cuda:"
-        dst = load_dataset('csv', data_files={
-            "train": 'dataset/reuters_train.csv',
-            "test": 'dataset/reuters_test.csv'
-        })
-        from utils import split_train_val
-        whole_train_dst= dst["train"]
-        train_val_index_list = split_train_val(whole_train_dst, seed=0, k=1, val_ratio=0.2)
-        train_index, val_index = train_val_index_list[0]
-        train_dst = whole_train_dst.select(train_index)
-        val_dst = whole_train_dst.select(val_index)
-        feature_distributor = FeatureDistribution(labels=[i for i in range(2)], device=device)
-        data_extender = DataExtender(whole_train_dst, train_dst, val_dst, fd= feature_distributor, iter_num=10,
-                 add_ratio_per_iter=0.1, diff_threshold_ratio=0.01, early_stop_threshold=2, try_num_limits=300,
-                 add_num_decay_rate=0.5, add_num_decay_method=None, add_num_decay_stage=None,
-                 random_seed=0)
-        data_extender.generate_data_to_pool(cache_files='./data_pool/pool.csv')
 
 
 

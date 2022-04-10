@@ -1,15 +1,17 @@
-import copy
-
+from utils import  generate_seed_set, PathConfig
 import numpy as np
 import tqdm
 from sklearn.metrics import pairwise_distances
 import pandas as pd
-import math
 from dataset_pool import get_dataset
 from sklearn.neighbors import NearestNeighbors
 from torch.utils.data import DataLoader
 from datasets import Dataset
 import torch
+
+
+FE_SAVE_PATH = PathConfig().get_fe_path()
+DATA_POOL_PATH = PathConfig().get_data_pool_path()
 
 
 def get_data_features(dst, feature_extractor, device="cuda:0"):
@@ -256,15 +258,8 @@ def generate_init_val_for_reuters(seed_set):
   whole_train_dst, test_dst = get_dataset('wheat_corn_reuters', model_name)
   whole_train_dst.set_format("torch")
   augmented_dst = get_dataset('augmented_wheat_corn_reuters', model_name)
-  # count = 0
-  # datas = augmented_dst['input_ids']
-  # for data in datas:
-  #   if len(data) != 512:
-  #     count += 1
-  # print(count)
-  # return
   print(len(augmented_dst))
-  feature_extractor = AutoModelForSequenceClassification.from_pretrained('./feature_extractor/reuter_fe',
+  feature_extractor = AutoModelForSequenceClassification.from_pretrained(FE_SAVE_PATH,
                                                                          output_hidden_states=True)
   feature_extractor = feature_extractor.to(device)
   feature_extractor.eval()
@@ -275,7 +270,7 @@ def generate_init_val_for_reuters(seed_set):
 
     val_set_index = sampler.holdout_sample(sample_ratio=1)
 
-    np.savetxt('data_pool/reuters/reuters_wheat_corn_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
+    np.savetxt(DATA_POOL_PATH+'reuters/reuters_wheat_corn_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
 
 
 def generate_init_val_for_reuters_ordered(seed_set, save_folder):
@@ -290,100 +285,10 @@ def generate_init_val_for_reuters_ordered(seed_set, save_folder):
     np.savetxt(save_folder + 'reuters_wheat_corn_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
 
 
-def generate_init_val_for_imdb(seed_set):
-  device="cuda:0"
-  from transformers import AutoModelForSequenceClassification
-  model_name = "distilbert-base-uncased"
-  whole_train_dst, test_dst = get_dataset('imdb', model_name)
-  whole_train_dst.set_format("torch")
-  augmented_dst = get_dataset('augmented_imdb', model_name)
-  print(len(augmented_dst))
-  feature_extractor = AutoModelForSequenceClassification.from_pretrained('./feature_extractor/imdb_fe',
-                                                                         output_hidden_states=True)
-  feature_extractor = feature_extractor.to(device)
-  feature_extractor.eval()
-  for s in seed_set:
-    sampler = ClassStratifiedSampler(feature_extractor=feature_extractor,
-                                     whole_train_set=whole_train_dst, augmented_dst=augmented_dst,
-                                     random_seed=s)
-
-    val_set_index = sampler.holdout_sample(sample_ratio=1)
-
-    np.savetxt('data_pool/imdb/imdb_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
-
-
-def generate_init_val_for_imdb_ordered(seed_set):
-  model_name = "distilbert-base-uncased"
-  whole_train_dst, test_dst = get_dataset('imdb', model_name)
-  whole_train_dst.set_format("torch")
-  augmented_dst = get_dataset('augmented_imdb', model_name)
-  print(len(augmented_dst))
-  sampler = ClassStratifiedSamplerByOrder(whole_train_set=whole_train_dst, augmented_dst=augmented_dst)
-  for s in seed_set:
-    val_set_index = sampler.holdout_sample(sample_ratio=1, random_seed=s)
-    np.savetxt('data_pool/imdb/byorder/imdb_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
-
-
-def load_dst(s, dst_name):
-  model_name = "distilbert-base-uncased"
-  if dst_name == 'reuters':
-    dst_indexes = np.loadtxt('data_pool/reuters/reuters_wheat_corn_valset_100p' + str(s) + '.txt')
-  elif dst_name == 'imdb':
-    dst_indexes = np.loadtxt('data_pool/imdb/imdb_valset_100p' + str(s) + '.txt')
-  return dst_indexes
-  dst_indexes = dst_indexes.astype(dtype=int)
-  augment_dst = get_dataset('augmented_wheat_corn_reuters', model_name)
-  dst = augment_dst.select(dst_indexes.tolist())
-  del augment_dst
-  print(len(dst))
-
-
-def check_val_set_diversity(dst_name, seed_set):
-  valset_set = []
-  model_name = "distilbert-base-uncased"
-  if dst_name == 'reuters':
-    augment_dst = get_dataset('augmented_wheat_corn_reuters', model_name)
-  elif dst_name == 'imdb':
-    augment_dst = get_dataset('augmented_imdb', model_name)
-  total_count_dict = {}
-  one_set_count_dict = {}
-  overlap_ratio_dict = {}
-
-  for s in seed_set:
-    if dst_name == 'reuters':
-      dst_indexes = np.loadtxt('data_pool/reuters/byorder/reuters_wheat_corn_valset_100p' + str(s) + '.txt')
-    elif dst_name == 'imdb':
-      dst_indexes = np.loadtxt('data_pool/imdb/byorder/imdb_valset_100p' + str(s) + '.txt')
-    dst_indexes = dst_indexes.astype(dtype=int)
-    dst = augment_dst.select(dst_indexes.tolist())
-    print(len(dst))
-    dst = dst.map(lambda example, idx: {'idx': dst_indexes[idx]}, with_indices=True)
-    class_indexes = {}
-    for key in [0, 1]:
-      class_indexes[key] = dst.filter(lambda example: example['labels'] == key)['idx'].numpy().tolist()
-    valset_set.append(class_indexes)
-
-  for key in valset_set[0].keys():
-    temp = set()
-    for valset in valset_set:
-      temp = temp | set(valset[key])
-    total_count_dict[key] = len(temp)
-    one_set_count_dict[key] = len(valset_set[0][key])
-    overlap_ratio_dict[key] = one_set_count_dict[key] / total_count_dict[key]
-
-  print(one_set_count_dict)
-  print(total_count_dict)
-  print(overlap_ratio_dict)
-
-
 if __name__ == '__main__':
-  np.random.seed(0)  # 0
-  seed_set = np.random.randint(0, 10000, size=10).tolist()
-  # generate_init_val_for_reuters(seed_set)
-  # generate_init_val_for_imdb(seed_set)
+  seed_set = generate_seed_set()
+  generate_init_val_for_reuters(seed_set)
+  generate_init_val_for_reuters_ordered(seed_set, save_folder=DATA_POOL_PATH+'reuters/byorder/')
 
-  # generate_init_val_for_reuters_ordered(seed_set, save_folder='data_pool/reuters/byorder/')
 
-  generate_init_val_for_imdb_ordered(seed_set)
 
-  check_val_set_diversity('imdb', seed_set)

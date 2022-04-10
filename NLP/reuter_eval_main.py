@@ -12,8 +12,12 @@ from feature_distribution import FeatureDistribution, FeatureExtractorType
 from data_extender import DataExtender
 from dataset_pool import get_dataset, post_process
 from args import get_args
-# import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+from utils import PathConfig, generate_seed_set
+
+
+FE_SAVE_PATH = PathConfig().get_fe_path()
+DATA_POOL_PATH = PathConfig().get_data_pool_path()
+
 args = get_args()
 print(args)
 
@@ -38,7 +42,7 @@ def one_round_training(seed):
 
     fe_type = FeatureExtractorType.FineTune if args.fe_type=='fine-tune' else FeatureExtractorType.PreTrain
     feature_distributor = FeatureDistribution(labels=[i for i in range(num_classes)], device=device,
-                                              weight_path='./feature_extractor/reuter_fe',
+                                              weight_path=FE_SAVE_PATH,
                                               dis_type=args.feature_dis_type,
                                               feature_extractor_type=fe_type)
 
@@ -68,7 +72,7 @@ def one_round_training(seed):
                                          try_num_limits=150,
                                          add_num_decay_rate=0.5, add_num_decay_method='triggered', add_num_decay_stage=None,
                                          random_seed=data_extender_seeds[i])
-            data_extender.generate_data_to_pool('./data_pool/reuters/pool.csv', post_process, model_name)
+            data_extender.generate_data_to_pool(DATA_POOL_PATH+'reuters/pool.csv', post_process, model_name)
             train_dst, val_dst = data_extender.run(ignore_feature_distance=args.ignore_fdd)
 
         setup_seed(42)
@@ -104,8 +108,7 @@ def one_round_training(seed):
 
 
 def Kfold_cross_validation():
-    np.random.seed(0)  # 0
-    seed_set = np.random.randint(0, 10000, size=10).tolist()
+    seed_set = generate_seed_set()
     val_performance_list = []
     test_performance_list = []
     performance_bias_list = []
@@ -192,10 +195,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # dst = load_dataset('csv', data_files=['dataset/reuters_train.csv'])
-    # dst1 = load_dataset('reuters21578.py', 'ModApte', split='test')
-    # dst1 = dst1.set_format('torch')
-    # print(dst)
 
 
 

@@ -29,7 +29,13 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.patches as mpatches
 from tqdm import tqdm
+from utils import PathConfig
 
+PC = PathConfig()
+DATASET_PATH = PC.get_dataset_path()
+DATA_POOL_PATH = PC.get_data_pool_path()
+FE_SAVE_PATH = PC.get_fe_path()
+GS_SAVE_PATH = PC.get_gs_path()
 from mpl_toolkits.mplot3d import Axes3D
 ################################
 #script to perform CV on RF for Movie and select max_features 500 for 500 partition choices
@@ -104,7 +110,7 @@ def get_data_for_grid_search(whole_dst, num_classes, k, seed, model_name, fe_wei
 			print('train_val_feature_distribution_diff', train_val_feature_distribution_diff)
 			data_extender = DataExtender(whole_dst, train_dst, val_dst, fd=feature_distributor, **data_extender_args,
 										 random_seed=data_extender_seeds[i])
-			data_extender.generate_data_to_pool('./data_pool/reuters/pool.csv', post_process, model_name)
+			data_extender.generate_data_to_pool(DATA_POOL_PATH+'reuters/pool.csv', post_process, model_name)
 			train_dst, val_dst = data_extender.run()
 
 			aug_train_val_index_list.append((train_index, [j+len(final_dst) for j in range(len(val_dst))]))
@@ -120,7 +126,7 @@ def get_data_for_grid_search(whole_dst, num_classes, k, seed, model_name, fe_wei
 def crossvalidate(whole_dst, parameter_candidates, num_classes, num_folds, random_seed, data_extender_args, is_aug):
 	data, iterable_indexes = get_data_for_grid_search(whole_dst, num_classes=num_classes, k=num_folds, seed=random_seed,
 													  model_name="distilbert-base-uncased",
-													  fe_weight_path='./feature_extractor/reuter_fe',
+													  fe_weight_path=FE_SAVE_PATH,
 													  is_aug=is_aug, device="cuda:0",
 													  data_extender_args=data_extender_args)
 	Y = data["label"]
@@ -167,9 +173,9 @@ def main(is_aug, rounds=100):
 	import pickle
 
 	if is_aug:
-		save_name = 'grid_search/aug_REUTERSSVM_differentpartitions_'+str(rounds)+'_'+str(num_folds)+'_folds'
+		save_name = GS_SAVE_PATH+'aug_REUTERSSVM_differentpartitions_'+str(rounds)+'_'+str(num_folds)+'_folds'
 	else:
-		save_name = 'grid_search/REUTERSSVM_differentpartitions_'+str(rounds)+'_'+str(num_folds)+'_folds'
+		save_name = GS_SAVE_PATH+'REUTERSSVM_differentpartitions_'+str(rounds)+'_'+str(num_folds)+'_folds'
 
 	with open(save_name, 'wb') as fp:
 		pickle.dump(results, fp)
@@ -183,10 +189,7 @@ def repeatedchoicesplotter(R, K, rounds, prefix=''):
 	# load data
 	# 1000 independent prediction error estiamtes for each parameter value in the grid
 	if (K == 5):
-		with open('grid_search/reproduce1/'+prefix+'REUTERSSVM_differentpartitions_'+str(rounds*R)+'_5_folds', 'rb') as fp:
-			results = pickle.load(fp)
-	elif (K == 10):
-		with open('grid_search/'+prefix+'REUTERSSVM_differentpartitions_'+str(rounds*R)+'_10_folds', 'rb') as fp:
+		with open(GS_SAVE_PATH+prefix+'REUTERSSVM_differentpartitions_'+str(rounds*R)+'_5_folds', 'rb') as fp:
 			results = pickle.load(fp)
 	else:
 		print("no precomputed data")
@@ -257,28 +260,6 @@ def repeatedchoicesplotter(R, K, rounds, prefix=''):
 
 	return [np.sqrt(np.var(choicesofC, ddof=1)), np.sqrt(np.var(choicesofGamma, ddof=1)),
 			np.sqrt(np.var(repeatedscores, ddof=1)), choicesofC, choicesofGamma, indexofCchoices, indexofGammachoices]
-
-
-def dst_test():
-	num_classes = 2
-	data_extender_args = {
-		"iter_num": 10,
-		"add_ratio_per_iter": 0.1,
-		"diff_threshold_ratio": 0.01 * num_classes,
-		"early_stop_threshold": 3,
-		"try_num_limits": 150,
-		"add_num_decay_rate": 0.5,
-		"add_num_decay_method": 'triggered',
-		"add_num_decay_stage": None
-	}
-	dst, iterable_indexes = get_data_for_grid_search(num_classes=2, k=5, seed=0, model_name="distilbert-base-uncased",
-													 dst_name='wheat_corn_reuters_nosplit',
-													 fe_weight_path='./feature_extractor/reuter_fe',
-													 is_aug=False, device="cuda:0",
-													 data_extender_args=data_extender_args)
-
-	text_list = dst['text']
-	print(dst)
 
 
 if __name__ == '__main__':

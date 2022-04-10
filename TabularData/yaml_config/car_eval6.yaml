@@ -1,4 +1,4 @@
-file_path: ../datasets/car_evaluation.csv
+file_path: ./datasets/car_evaluation.csv
 test_ratio: 0.3
 model: xgb
 model_params:

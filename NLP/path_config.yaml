@@ -1,0 +1,4 @@
+dataset_path: ./dataset/
+data_pool_path: ./data_pool/
+feature_extractor_save_path: ./feature_extractor/reuter_fe
+grid_search_save_path: ./grid_search/

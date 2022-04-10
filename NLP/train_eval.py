@@ -43,7 +43,6 @@ def eval(model, eval_dataloader, device):
     print("acc", acc)
     print("macro", f1)
     return acc['accuracy'], f1['f1']
-    # print("micro", metric_f1.compute(average="micro"))
 
 
 def train(model, train_dataloader, eval_dataloader, test_loader, optimizer, lr_scheduler, num_epochs, device):
@@ -52,7 +51,6 @@ def train(model, train_dataloader, eval_dataloader, test_loader, optimizer, lr_s
     final_bias_f1 = 0
     for epoch in range(num_epochs):
         if epoch % 2 == 0:
-            # TODO new added
             if eval_dataloader is not None:
                 acc, f1 = eval(model, eval_dataloader, device)
                 if f1 > best_val_f1:
@@ -94,7 +92,6 @@ def train_efficient(model, train_dataloader, eval_dataloader, test_loader, optim
     best_state_dict = None
     for epoch in range(num_epochs):
         if epoch % 2 == 0:
-            # TODO new added
             train_acc, train_f1 = eval(model, train_dataloader, device)
             print("training acc %f and f1 %f"%(train_acc, train_f1))
             if eval_dataloader is not None:

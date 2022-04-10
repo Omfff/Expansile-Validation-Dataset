@@ -1,10 +1,13 @@
-from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer, AdamW, get_scheduler
+from transformers import AutoModelForSequenceClassification, AdamW, get_scheduler
 from torch.utils.data import DataLoader
 from train_eval import train
 from dataset_pool import get_dataset
+from utils import PathConfig
+
+FE_SAVE_PATH = PathConfig().get_fe_path()
 
 
-def load_feature_extractor(weight_path='./feature_extractor/reuter_fe'):
+def load_feature_extractor(weight_path=FE_SAVE_PATH):
     model = AutoModelForSequenceClassification.from_pretrained(weight_path, output_hidden_states=True)
     return model
 
@@ -30,14 +33,11 @@ def train_feature_extractor(device, model_name, dataset_name, num_classes, model
 def main():
     device = "cuda:0"
     model_name = "bert-base-uncased"
-    # dataset_name = 'wheat_corn_reuters'
-    # model_save_path = './feature_extractor/reuter_fe'
-    dataset_name = 'imdb'
+    dataset_name = 'wheat_corn_reuters'
     num_classes = 2
     train_feature_extractor(device, model_name, dataset_name, num_classes,
-                            model_save_path='./feature_extractor/imdb_fe')
+                            model_save_path=FE_SAVE_PATH)
 
 
 if __name__ == '__main__':
     main()
-    # load_feature_extractor(weight_path='./feature_extractor/reuter_fe')

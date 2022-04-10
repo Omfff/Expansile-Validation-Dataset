@@ -1,4 +1,4 @@
-file_path: ../datasets/page_blocks.csv
+file_path: ./datasets/page_blocks.csv
 test_ratio: 0.2
 model: xgb
 model_params:

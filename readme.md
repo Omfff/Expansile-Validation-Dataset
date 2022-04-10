@@ -29,6 +29,36 @@ Each folder contains four core files(ie., `augmentation.py`, `sample.py`, `data_
 
 Note that, for the sake of brevity, comments on the code are mainly placed in the files under the `CV` folder.
 
+## Datasets
+
+**For Tabular Data**
+
+All datasets are provided in 'TabularData/datasets/'. And you could also download them from kaggle or UCI. 
+
+**For Text**
+
+Except for the feature extractor, all files are already provided in the corresponding folders. If you want to generate these files from scratch, execute the following commands in order.
+
+```shell
+# Configure the path_config.yaml
+
+# To load dataset from nltk and save, run:
+python reuters.py
+
+# Change the path of models in nlpaug to your local path, and run
+CUDA_VISIBLE_DEVICES=0 python augmentation.py
+
+# To obtain feature extractor, run
+CUDA_VISIBLE_DEVICES=0 python feature_extractor.py
+
+# To obtain initial val-set by coreset operation, run
+CUDA_VISIBLE_DEVICES=0 python samply.py
+```
+
+**For CV**
+
+
+
 ## Train and Evaluation
 
 To get the results in the paper, run following commands:
