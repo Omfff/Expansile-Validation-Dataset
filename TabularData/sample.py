@@ -187,8 +187,6 @@ class ClassStratifiedSampler(object):
     return indexes
 
 
-
-
 if __name__ == '__main__':
     seed = 0
     np.random.seed(seed)

@@ -36,10 +36,13 @@ To get the results in the paper, run following commands:
 **Results of tabular data**
 
 ```bash
+# configure the save path in run_all_xgb.sh and run
 ./run_all_xgb.sh
 
+# configure the save path in run_all_xgb_coreset.sh and then run
 ./run_all_xgb_coreset.sh
 
+# configure the same path as the two above at the beginning of the file
 python record.py
 ```
 

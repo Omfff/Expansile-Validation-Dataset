@@ -1,5 +1,62 @@
 import pickle
-from draw_result import draw1, draw2
+import matplotlib.pyplot as plt
+import numpy as np
+
+EXPERIMENTS_SAVE_PATH = './experiments/'
+CORSET_EXPAN_SAVE_FOLDER = 'coreset'
+BASELINE_SAVE_FOLDER = 'baseline'
+
+
+def draw1(results, dst_list, method_list, line_style_list, line_color_list, labels=None):
+    num_sub_fig = 3
+    x_axis_name = dst_list
+    x_axis = [i for i in range(len(x_axis_name))]
+    label_list = method_list if labels is None else labels
+    fig, ax = plt.subplots(1, num_sub_fig, figsize=(23, 5))
+    for i, me in enumerate(method_list):
+        ax[0].plot(results[me+'_std'], label=label_list[i], linestyle=line_style_list[i], color=line_color_list[i])
+        ax[1].plot(results[me+'_bias'], label=label_list[i], linestyle=line_style_list[i], color=line_color_list[i])
+        ax[2].plot(results[me+'_test_f1'], label=label_list[i], linestyle=line_style_list[i], color=line_color_list[i])
+
+    title_list = ['Variance', 'Bias', 'Test F1']
+    for i in range(num_sub_fig):
+        ax[i].set_title(title_list[i])
+        ax[i].set_xticks(x_axis)
+        ax[i].set_xticklabels(x_axis_name, rotation=20, fontsize=8)
+    ax[num_sub_fig-1].legend(loc=2, bbox_to_anchor=(1.05, 1.0), borderaxespad=0.)
+
+    plt.show()
+
+
+def draw2(results, dst_list, method_list, color_list, hatch_list, labels=None):
+    x_axis_name = dst_list
+    x_axis = np.arange(len(x_axis_name))
+
+    num_subplots = 3
+
+    total_width, n = 1, len(method_list)+1
+    width = total_width / n
+    x_axis = x_axis - (total_width - width) / 2
+
+    label_list = method_list if labels is None else labels
+
+    fig, ax = plt.subplots(1, num_subplots, figsize=(40, 5))
+    for i,m in enumerate(method_list):
+        ax[0].bar(x_axis + i * width, results[m + '_std'], width=width, label=label_list[i], color=color_list[i], hatch=hatch_list[i])
+        ax[1].bar(x_axis + i * width, results[m + '_bias'], width=width, label=label_list[i], color=color_list[i], hatch=hatch_list[i])
+        ax[2].bar(x_axis + i * width, results[m + '_test_f1'], width=width, label=label_list[i], color=color_list[i], hatch=hatch_list[i])
+
+    title_list = ['Variance', 'Bias', 'F1']
+
+    for j in range(num_subplots):
+        ax[j].set_title(title_list[j])
+        ax[j].set_xticks(x_axis)
+        ax[j].set_xticklabels(x_axis_name, rotation=20, fontsize=8)
+
+    ax[-1].legend(loc=2, bbox_to_anchor=(1.05, 1.0), borderaxespad=0.)
+
+    plt.subplots_adjust(left=0.02)
+    plt.show()
 
 
 def load_file(file_name):
@@ -12,10 +69,9 @@ def read_one_record(model_name, dataset_name, method, file_folder):
     records = {}
     for m in method:
         if 'coreset' in m:
-            file_path = file_folder+'coreset/' + dataset_name + '_' + model_name + '_' + m + '.txt'
+            file_path = file_folder + CORSET_EXPAN_SAVE_FOLDER +'/' + dataset_name + '_' + model_name + '_' + m + '.txt'
         else:
-            # file_path = file_folder+ 'reproduce3/' +dataset_name+'_'+model_name+'_'+m+'.txt'
-            file_path = file_folder+dataset_name+'_'+model_name+'_'+m+'.txt'
+            file_path = file_folder+ BASELINE_SAVE_FOLDER +'/' +dataset_name+'_'+model_name+'_'+m+'.txt'
         r = load_file(file_path)
         print(r)
         r['std'] = r.pop('val_f1_score_mean_std')
@@ -124,17 +180,16 @@ def output_for_latex(data):
 if __name__ == '__main__':
     model_list = ['xgb']
     dataset_name_list = ['pageblocks42', 'car_eval18', 'car_eval6', 'bank_marketing10p', 'mushroom10p']
-    file_folder = './experiments/'
     # results in table 2
-    results2 = baseline_vs_coreset(model_list, dataset_name_list, file_folder = './experiments/early_stop/')
+    results2 = baseline_vs_coreset(model_list, dataset_name_list, file_folder=EXPERIMENTS_SAVE_PATH)
     output_for_latex(results2)
     # results in table 4
-    results4 = random_coreset_vs_coreset(model_list, dataset_name_list, file_folder = './experiments/early_stop/')
+    results4 = random_coreset_vs_coreset(model_list, dataset_name_list, file_folder=EXPERIMENTS_SAVE_PATH)
     output_for_latex(results4)
     # results in table 5
-    results5 = holdout_vs_part_coreset(model_list, dataset_name_list, file_folder = './experiments/early_stop/')
+    results5 = holdout_vs_part_coreset(model_list, dataset_name_list, file_folder=EXPERIMENTS_SAVE_PATH)
     output_for_latex(results5)
     # results in table 6
-    results6 = baseline_vs_expansion(model_list, dataset_name_list, file_folder='./experiments/early_stop/')
+    results6 = baseline_vs_expansion(model_list, dataset_name_list, file_folder=EXPERIMENTS_SAVE_PATH)
     output_for_latex(results6)
 
