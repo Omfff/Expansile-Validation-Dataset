@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dataset_name_list=('pageblocks42' 'car_eval18' 'car_eval6' 'bank_marketing10p' 'mushroom10p')
+dataset_name_list=('pageblocks56' 'car_eval18' 'car_eval6' 'bank_marketing10p' 'mushroom10p')
 main_list=('pageblocks_eval_main56.py' 'car_eval_main18.py' 'car_eval_main6.py' 'bank_marketing_main.py' 'mushroom_main.py')
 
 val_method_list=('holdout' 'kfold' 'jkfold' 'aug_holdout' 'aug_kfold')

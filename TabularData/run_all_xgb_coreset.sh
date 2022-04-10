@@ -4,9 +4,9 @@ dataset_name_list=('pageblocks56' 'car_eval18' 'car_eval6' 'bank_marketing10p' '
 main_list=('pageblocks_eval_main56.py' 'car_eval_main18.py' 'car_eval_main6.py' 'bank_marketing_main.py' 'mushroom_main.py')
 
 
-val_method_list=('coreset_holdout' 'random_coreset_holdout' 'part_coreset_holdout') #
-k_list=(1 1 1)
-repeatj_list=(1 1 1)
+val_method_list=('coreset_holdout' 'aug_coreset_holdout' 'random_coreset_holdout' 'part_coreset_holdout') #
+k_list=(1 1 1 1)
+repeatj_list=(1 1 1 1)
 
 model_name='xgb'
 save_path='./experiment/coreset/'

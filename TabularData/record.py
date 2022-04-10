@@ -179,7 +179,7 @@ def output_for_latex(data):
 
 if __name__ == '__main__':
     model_list = ['xgb']
-    dataset_name_list = ['pageblocks42', 'car_eval18', 'car_eval6', 'bank_marketing10p', 'mushroom10p']
+    dataset_name_list = ['pageblocks56', 'car_eval18', 'car_eval6', 'bank_marketing10p', 'mushroom10p']
     # results in table 2
     results2 = baseline_vs_coreset(model_list, dataset_name_list, file_folder=EXPERIMENTS_SAVE_PATH)
     output_for_latex(results2)
