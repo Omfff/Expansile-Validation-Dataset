@@ -1,4 +1,4 @@
-# Expansile Validation Dataset
+# Expansile Validation Dataset (EVD): Towards Resolving The Train/Validation Split Tradeoff
 
 This repository is the official implementation of [Expansile Validation Dataset (EVD): Towards Resolving The Train/Validation Split Tradeoff](). 
 
@@ -45,6 +45,8 @@ python record.py
 
 **Results of  Reuters(Text, NLP)**
 
+feature extractor 的训练
+
 ```bash
 # for results in Tabel 2
 
@@ -76,6 +78,8 @@ python reuters_hyper_params_search.py
 ```
 
 **Results of  CIFAR-10-LT(Image, CV)**
+
+feature extractor 的训练
 
 ```bash
 # for results in Tabel 2

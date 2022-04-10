@@ -1,13 +1,11 @@
-from util import check_data, read_data, split_labels, adjust_dataset_size, print_result
+from util import check_data, read_data, split_labels, adjust_dataset_size, read_config, generate_seed_set
 from train_eval import train
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split
 import category_encoders
-import yaml
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 from feature_distribution import FeatureType
-from args import get_args, complete_cfg_by_args
+from args import get_args
 
 args = get_args()
 
@@ -58,31 +56,18 @@ def data_preprocess_local(dst, selected_labels, var_categorical:list, var_numeri
 
 
 def main():
-    cfg_path = 'yaml_config/bank_marketing.yaml'
-    # seed_set = [10*i for i in range(10)]
-    np.random.seed(0)
-    seed_set = np.random.randint(0, 10000, size=100).tolist()
+    cfg = read_config(cfg_path='yaml_config/bank_marketing.yaml', args=args)
+    seed_set = generate_seed_set()
     selected_labels = ['no', 'yes']
     var_categorical = ["job", "marital", "education", "default", "housing", "loan", "contact", "month", "day_of_week",
                        "poutcome"]
     var_numerical = ["age","cons.price.idx","cons.conf.idx", "euribor3m"]
-
-    with open(cfg_path, 'r') as f:
-        cfg = yaml.safe_load(f)
-        cfg = complete_cfg_by_args(cfg, args)
-        print(cfg)
 
     dst = read_data(cfg['file_path'], delimiter=';')
 
     dst = data_preprocess_global(dst, selected_labels, y_name='y')
 
     dst = adjust_dataset_size(dst, action_type=1, y_name='y', sample_rate=0.1)
-
-    print(len(dst))
-    print(dst.shape)
-    return
-
-    # dst = adjust_dataset_size(dst, action_type=2, y_name='y', unbalanced_ratio=15)
 
     dst_x, dst_y = split_labels(dst, y_name='y')
 
@@ -99,28 +84,6 @@ def main():
         oridinal_f=['education']
     )
     train(cfg, seed_set, (x_train, y_train), (x_test, y_test), feature_cols, label_list=[0, 1])
-
-    # print(x_train.shape, y_train.shape)
-    #
-    # from analysis import FeatureDistribution
-    # fd = FeatureDistribution(x_train, y_train, labels=[0, 1],
-    #                      categorical_col=['contact', 'poutcome' , 'job', 'month', 'marital', 'day_of_week',
-    #     'education', 'housing', 'loan'],
-    #                      numerical_col=var_numerical)
-    #
-    # fd.run()
-    # analysis
-    # from analysis import tsne_vis
-    # tsne_vis(x_train.values, y_train)
-    # tsne_vis(x_train.values, y_train)
-    # return 0
-    # check correctness
-    # print(x_train.head())
-    # print(x_train.head().index)
-    # print(dst_x.iloc[x_train.head().index.tolist()])
-
-    # perf_dict = train(cfg, seed_set, x_train, x_test, y_train, y_test)
-    # print_result(perf_dict)
 
 
 if __name__ == '__main__':

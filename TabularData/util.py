@@ -1,11 +1,21 @@
 import pandas as pd
 from pandas import DataFrame
 import numpy as np
+import yaml
+from args import complete_cfg_by_args
 
 
 def read_data(file_path, delimiter=None):
     data = pd.read_csv(file_path, delimiter=delimiter)
     return data
+
+
+def read_config(cfg_path, args):
+    with open(cfg_path, 'r') as f:
+        cfg = yaml.safe_load(f)
+        cfg = complete_cfg_by_args(cfg, args)
+        print(cfg)
+    return cfg
 
 
 def check_data(data):
@@ -25,6 +35,12 @@ def split_labels(dst, y_name:str):
     dst_x = dst_x.reset_index(drop=True)
     dst_y = dst_y.reset_index(drop=True)
     return dst_x, dst_y
+
+
+def generate_seed_set():
+    np.random.seed(0)
+    seed_set = np.random.randint(0, 10000, size=100).tolist()
+    return seed_set
 
 
 def adjust_dataset_size(dst:DataFrame, action_type, y_name, sample_rate=None, unbalanced_ratio=None):

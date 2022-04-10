@@ -1,13 +1,9 @@
-from util import check_data, read_data, split_labels, adjust_dataset_size, print_result
+from util import check_data, read_data, split_labels, adjust_dataset_size, read_config, generate_seed_set
 from train_eval import train
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split
 import category_encoders
-import yaml
-import numpy as np
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-import pandas as pd
 from feature_distribution import FeatureType
-from args import get_args, complete_cfg_by_args
+from args import get_args
 
 args = get_args()
 
@@ -33,30 +29,17 @@ def data_preprocess_local(dst, selected_labels, var_categorical:list, var_numeri
 
 
 def main():
-    cfg_path = 'yaml_config/mushroom.yaml'
-    # seed_set = [10*i for i in range(10)]
-    np.random.seed(0)  # 0
-    seed_set = np.random.randint(0, 10000, size=100).tolist()
+    cfg = read_config(cfg_path='yaml_config/mushroom.yaml', args=args)
+    seed_set = generate_seed_set()
     selected_labels = ['e', 'p']
     var_categorical = []
     var_numerical = []
-
-    with open(cfg_path, 'r') as f:
-        cfg = yaml.safe_load(f)
-        cfg = complete_cfg_by_args(cfg, args)
-        print(cfg)
 
     dst = read_data(cfg['file_path'])
 
     dst = data_preprocess_global(dst, selected_labels, y_name='class')
 
     dst = adjust_dataset_size(dst, action_type=1, y_name='class', sample_rate=0.1)
-
-    print(len(dst))
-    print(dst.shape)
-    return
-
-    # dst = adjust_dataset_size(dst, action_type=2, y_name='class', unbalanced_ratio=5)
 
     dst_x, dst_y = split_labels(dst, y_name='class')
 
@@ -74,16 +57,6 @@ def main():
         oridinal_f=[]
     )
     train(cfg, seed_set, (x_train, y_train), (x_test, y_test), feature_cols, label_list=[0, 1])
-
-    # from analysis import FeatureDistribution
-    # fd = FeatureDistribution(x_train, y_train, labels=[0, 1],
-    #                      categorical_col=list(x_train.columns),
-    #                      numerical_col=var_numerical)
-    #
-    # fd.run()
-
-    # perf_dict = train(cfg, seed_set, x_train, x_test, y_train, y_test)
-    # print_result(perf_dict)
 
 
 if __name__ == '__main__':

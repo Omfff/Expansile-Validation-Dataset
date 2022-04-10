@@ -106,6 +106,17 @@ def get_dataset(dst_name, model_name, seed=None):
         dst = post_process(dst, model_name)
         dst.set_format('torch')
         return dst
+    elif dst_name == 'newsgroups':
+        dst = load_dataset('csv', data_files={
+            "train": '/ssd1/omf/datasets/newsgroups/newsgroups_train.csv',
+            "test": '/ssd1/omf/datasets/newsgroups/newsgroups_test.csv'
+        })
+        train_dst, test_dst = dst['train'], dst['test']
+        train_dst = post_process(train_dst, model_name)
+        test_dst = post_process(test_dst, model_name)
+        print('train shape', train_dst.shape)
+        print('test shape', test_dst.shape)
+        return train_dst, test_dst
 
 
 if __name__ == '__main__':
