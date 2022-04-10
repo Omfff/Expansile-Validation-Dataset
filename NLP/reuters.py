@@ -3,7 +3,7 @@ import pandas as pd
 from utils import PathConfig
 
 
-DATASET_SAVE_PATH = PathConfig().get_dataset_path()
+DATASET_SAVE_PATH = PathConfig().get_reuters_dataset_path()
 
 
 def generate_dataset_from_nltk():
@@ -41,8 +41,8 @@ def generate_dataset_from_nltk():
 
     train_set = convert_to_df(training_index)
     test_set = convert_to_df(test_index)
-    train_set.to_csv('dataset/reuters_train.csv', index=False)
-    test_set.to_csv('dataset/reuters_test.csv', index=False)
+    train_set.to_csv(DATASET_SAVE_PATH+ 'reuters_train.csv', index=False)
+    test_set.to_csv(DATASET_SAVE_PATH+'reuters_test.csv', index=False)
     return train_set, test_set
 
 

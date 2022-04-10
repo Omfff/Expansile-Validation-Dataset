@@ -40,7 +40,8 @@ All datasets are provided in 'TabularData/datasets/'. And you could also downloa
 Except for the feature extractor, all files are already provided in the corresponding folders. If you want to generate these files from scratch, execute the following commands in order.
 
 ```shell
-# Configure the path_config.yaml
+# Configure the path_config.yaml, to create configured path, run:
+python untils.py
 
 # To load dataset from nltk and save, run:
 python reuters.py
@@ -57,6 +58,25 @@ CUDA_VISIBLE_DEVICES=0 python samply.py
 
 **For CV**
 
+Due to the large file size of the image dataset, we here only provide the command to obtain these files rather than the original files.
+
+```shell
+# Configure the path_config.yaml, to create configured path, run:
+python untils.py
+
+# Generate cifar10-longtail
+python imbalanced_dataset.py
+
+# To generate auxiliary dataset
+python augmentation.py
+
+# To obtain feature extractor, run
+CUDA_VISIBLE_DEVICES=0 python feature_extractor.py
+
+# To obtain initial val-set by coreset operation, run
+CUDA_VISIBLE_DEVICES=0 python samply.py
+```
+
 
 
 ## Train and Evaluation
@@ -66,23 +86,21 @@ To get the results in the paper, run following commands:
 **Results of tabular data**
 
 ```bash
-# configure the save path in run_all_xgb.sh and run
+# Configure the save path in run_all_xgb.sh and run
 ./run_all_xgb.sh
 
-# configure the save path in run_all_xgb_coreset.sh and then run
+# Configure the save path in run_all_xgb_coreset.sh and then run
 ./run_all_xgb_coreset.sh
 
-# configure the same path as the two above at the beginning of the file
+# Configure the same path as the two above at the beginning of the file
 # then run the command to get the statistics in all Tables 
 python record.py
 ```
 
 **Results of  Reuters(Text, NLP)**
 
-feature extractor 的训练
-
 ```bash
-# for results in Tabel 2
+# For results in Tabel 2
 
 CUDA_VISIBLE_DEVICES=0 python reuter_eval_main.py -vm holdout --k 1 --save_name xxx
 
@@ -94,29 +112,27 @@ CUDA_VISIBLE_DEVICES=0 python reuter_eval_main.py -vm aug_coreset_whole --k 1 --
 
 
 
-# for results in Tabel 5
+# For results in Tabel 5
 
 CUDA_VISIBLE_DEVICES=0 python reuter_eval_main.py -vm coreset_part_holdout --k 1 --save_name xxx
 
 
-# for results in Tabel 6
+# For results in Tabel 6
 
 CUDA_VISIBLE_DEVICES=0 python reuter_eval_main.py -vm aug_holdout --k 1 --fe_type fine-tune --feature_dis_type NDB --save_name xxx
 
 CUDA_VISIBLE_DEVICES=0 python reuter_eval_main.py -vm aug_kfold --k 5 --fe_type fine-tune --feature_dis_type NDB --save_name xxx
 
 
-# for results in Figure 2
+# For results in Figure 2
 
 python reuters_hyper_params_search.py
 ```
 
 **Results of  CIFAR-10-LT(Image, CV)**
 
-feature extractor 的训练
-
 ```bash
-# for results in Tabel 2
+# For results in Tabel 2
 
 CUDA_VISIBLE_DEVICES=0 python cifar10_eval_main.py -vm holdout --k 1 --save-dir xxx
 
@@ -127,38 +143,22 @@ CUDA_VISIBLE_DEVICES=0 python cifar10_eval_main.py -vm jkfold --J 4 --k 5 --save
 CUDA_VISIBLE_DEVICES=0 python cifar10_eval_main.py -vm coreset_whole --k 1 --save-dir xxx
 
 
-# for results in Tabel 4
+# For results in Tabel 4
 
 CUDA_VISIBLE_DEVICES=0 python cifar10_eval_main.py -vm random_coreset --k 1 --save-dir xxx
 
 
-# for results in Tabel 5
+# For results in Tabel 5
 
 CUDA_VISIBLE_DEVICES=0 python cifar10_eval_main.py -vm coreset_part_holdout --k 1 --save-dir xxx
 
 
-# for results in Tabel 6
+# For results in Tabel 6
 
 CUDA_VISIBLE_DEVICES=0 python cifar10_eval_main.py -vm aug_holdout --k 1 --feature_dis_type NDB --config_path ./config/cifar10_default.yaml --save-dir xxx
 
 CUDA_VISIBLE_DEVICES=0 python cifar10_eval_main.py -vm aug_kfold --k 5 --feature_dis_type NDB --config_path ./config/cifar10_default.yaml --save-dir xxx
 ```
-
->📋  Describe how to train the models, with example commands on how to train the models in your paper, including the full training procedure and appropriate hyperparameters.
-
-
-
-## Results
-
-Our model achieves the following performance on :
-
-### [Image Classification on ImageNet](https://paperswithcode.com/sota/image-classification-on-imagenet)
-
-| Model name       | Top 1 Accuracy | Top 5 Accuracy |
-| ---------------- | -------------- | -------------- |
-| My awesome model | 85%            | 95%            |
-
->📋  Include a table of results from your paper, and link back to the leaderboard for clarity and context. If your main result is a figure, include that figure and link to the command or notebook tc reproduce it. 
 
 
 

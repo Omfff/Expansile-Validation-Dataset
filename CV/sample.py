@@ -8,9 +8,11 @@ import math
 from imbalanced_dataset import get_dataset, DatasetWrapper, update_transform
 from sklearn.neighbors import NearestNeighbors
 from torch.utils.data import DataLoader
+from utils import PathConfig, generate_seed_set
 
 
-SAMPLE_INDEX_SAVE_PATH = 'data_indexes'
+PC = PathConfig()
+SAMPLE_INDEX_SAVE_PATH = PC.get_cifar10_index_path()
 
 
 def get_data_features(dst:DatasetWrapper):
@@ -22,7 +24,7 @@ def get_data_features(dst:DatasetWrapper):
   from feature_extractor import load_feature_extractor
   import torch
   device = "cuda:0"
-  feature_extractor = load_feature_extractor('feature_extractor/model.th', device)
+  feature_extractor = load_feature_extractor(PC.get_cifar10_fe_path()+'model.th', device)
   feature_extractor.eval()
   loader = DataLoader(dst, batch_size=64, shuffle=False, num_workers=8, pin_memory=False)
   features_list = []
@@ -268,7 +270,7 @@ def generate_init_val_for_cifar10(seed_set):
 
     val_set_index = sampler.holdout_sample(train_dst.dataset.num_per_cls_dict)
 
-    np.savetxt(SAMPLE_INDEX_SAVE_PATH+'/cifar10_1p_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
+    np.savetxt(SAMPLE_INDEX_SAVE_PATH+'cifar10_1p_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
 
 
 def generate_init_val_for_cifar10_byorder(seed_set, save_folder):
@@ -287,54 +289,8 @@ def generate_init_val_for_cifar10_byorder(seed_set, save_folder):
     np.savetxt(save_folder+'cifar10_1p_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
 
 
-def load_dst(s):
-  dst_indexes = np.loadtxt(SAMPLE_INDEX_SAVE_PATH+'/cifar10_1p_valset_100p'+str(s)+'.txt')
-  dst_indexes = dst_indexes.astype(dtype=int)
-  return dst_indexes
-  augment_dst = get_dataset('aug_cifar10')
-  dst = DatasetWrapper(augment_dst.get_dataset_by_indexes(dst_indexes))
-  del augment_dst
-  for l in dst.class_split_indexes.keys():
-    print(len(dst.class_split_indexes[l]))
-
-
-def check_val_set_diversity(seed_set, index_folder):
-  """
-    Check the overlap of the validation sets under different random seeds
-  """
-  valset_set = []
-  augment_dst = get_dataset('aug_cifar10')
-  for s in seed_set:
-    dst_indexes = np.loadtxt(index_folder+'cifar10_1p_valset_100p'+str(s)+'.txt')
-    dst_indexes = dst_indexes.astype(dtype=int)
-    dst = DatasetWrapper(augment_dst.get_dataset_by_indexes(dst_indexes))
-    class_indexes = dst.class_split_indexes
-    results = {}
-    for key, ids in class_indexes.items():
-      results[key] = dst_indexes[ids]
-    valset_set.append(results)
-
-  total_count_dict = {}
-  one_set_count_dict = {}
-  overlap_ratio_dict = {}
-  for key in valset_set[0].keys():
-    temp = set()
-    for valset in valset_set:
-      temp = temp | set(valset[key])
-    total_count_dict[key] = len(temp)
-    one_set_count_dict[key] = len(valset_set[0][key])
-    overlap_ratio_dict[key] = one_set_count_dict[key]/total_count_dict[key]
-
-  print(one_set_count_dict)
-  print(total_count_dict)
-  print(overlap_ratio_dict)
-
-
 if __name__ == '__main__':
-  np.random.seed(0)  # 0
-  seed_set = np.random.randint(0, 10000, size=10).tolist()
+  seed_set = generate_seed_set()
   generate_init_val_for_cifar10(seed_set)
+  generate_init_val_for_cifar10_byorder(seed_set, save_folder=SAMPLE_INDEX_SAVE_PATH+'byorder/')
 
-  # generate_init_val_for_cifar10_byorder(seed_set, save_folder=SAMPLE_INDEX_SAVE_PATH+'/byorder/')
-  #
-  # check_val_set_diversity(seed_set, index_folder=SAMPLE_INDEX_SAVE_PATH+'/byorder/')

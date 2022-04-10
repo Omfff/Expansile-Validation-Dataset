@@ -4,7 +4,7 @@ from train_eval import train
 from dataset_pool import get_dataset
 from utils import PathConfig
 
-FE_SAVE_PATH = PathConfig().get_fe_path()
+FE_SAVE_PATH = PathConfig().get_reuters_fe_path()
 
 
 def load_feature_extractor(weight_path=FE_SAVE_PATH):

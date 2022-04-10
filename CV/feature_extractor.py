@@ -5,7 +5,6 @@ import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
 import torch.utils.data
-import numpy as np
 import models
 from args import get_cifar10_args, get_cifar10_fe_args
 from data_loader import get_dataloader, split_train_val
@@ -70,8 +69,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    model  = load_feature_extractor('feature_extractor/model.th', device="cuda:0")
-    data = torch.ones((1, 3, 32 ,32), dtype=torch.float).to("cuda:0")
-    out = model(data)
-    print(out)
+    main()

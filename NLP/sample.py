@@ -10,8 +10,8 @@ from datasets import Dataset
 import torch
 
 
-FE_SAVE_PATH = PathConfig().get_fe_path()
-DATA_POOL_PATH = PathConfig().get_data_pool_path()
+FE_SAVE_PATH = PathConfig().get_reuters_fe_path()
+DATA_POOL_PATH = PathConfig().get_reuters_data_pool_path()
 
 
 def get_data_features(dst, feature_extractor, device="cuda:0"):
@@ -270,7 +270,7 @@ def generate_init_val_for_reuters(seed_set):
 
     val_set_index = sampler.holdout_sample(sample_ratio=1)
 
-    np.savetxt(DATA_POOL_PATH+'reuters/reuters_wheat_corn_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
+    np.savetxt(DATA_POOL_PATH+'reuters_wheat_corn_valset_100p'+ str(s) +'.txt', np.asarray(val_set_index, dtype=int), fmt="%d")
 
 
 def generate_init_val_for_reuters_ordered(seed_set, save_folder):
@@ -288,7 +288,7 @@ def generate_init_val_for_reuters_ordered(seed_set, save_folder):
 if __name__ == '__main__':
   seed_set = generate_seed_set()
   generate_init_val_for_reuters(seed_set)
-  generate_init_val_for_reuters_ordered(seed_set, save_folder=DATA_POOL_PATH+'reuters/byorder/')
+  generate_init_val_for_reuters_ordered(seed_set, save_folder=DATA_POOL_PATH+'byorder/')
 
 
 

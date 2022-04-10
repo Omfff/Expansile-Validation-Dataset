@@ -32,10 +32,9 @@ from tqdm import tqdm
 from utils import PathConfig
 
 PC = PathConfig()
-DATASET_PATH = PC.get_dataset_path()
-DATA_POOL_PATH = PC.get_data_pool_path()
-FE_SAVE_PATH = PC.get_fe_path()
-GS_SAVE_PATH = PC.get_gs_path()
+DATA_POOL_PATH = PC.get_reuters_data_pool_path()
+FE_SAVE_PATH = PC.get_reuters_fe_path()
+GS_SAVE_PATH = PC.get_reuters_gs_path()
 from mpl_toolkits.mplot3d import Axes3D
 ################################
 #script to perform CV on RF for Movie and select max_features 500 for 500 partition choices
@@ -110,7 +109,7 @@ def get_data_for_grid_search(whole_dst, num_classes, k, seed, model_name, fe_wei
 			print('train_val_feature_distribution_diff', train_val_feature_distribution_diff)
 			data_extender = DataExtender(whole_dst, train_dst, val_dst, fd=feature_distributor, **data_extender_args,
 										 random_seed=data_extender_seeds[i])
-			data_extender.generate_data_to_pool(DATA_POOL_PATH+'reuters/pool.csv', post_process, model_name)
+			data_extender.generate_data_to_pool(DATA_POOL_PATH+'pool.csv', post_process, model_name)
 			train_dst, val_dst = data_extender.run()
 
 			aug_train_val_index_list.append((train_index, [j+len(final_dst) for j in range(len(val_dst))]))

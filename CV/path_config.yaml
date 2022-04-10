@@ -1,4 +1,3 @@
-dataset_path: ./dataset/
+dataset_path: ./datasets/
 data_pool_path: ./data_pool/
 feature_extractor_save_path: ./feature_extractor/
-grid_search_save_path: ./grid_search/

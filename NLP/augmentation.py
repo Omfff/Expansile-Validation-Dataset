@@ -134,8 +134,8 @@ class NLPAugment(object):
 if __name__ == '__main__':
     from utils import PathConfig
     PC = PathConfig()
-    DATASET_PATH = PC.get_dataset_path()
-    DATA_POOL_PATH = PC.get_data_pool_path()
+    DATASET_PATH = PC.get_reuters_dataset_path()
+    DATA_POOL_PATH = PC.get_reuters_data_pool_path()
     download()
 
     def generate_reuters_data_main():
@@ -144,7 +144,7 @@ if __name__ == '__main__':
             "test": DATASET_PATH + 'reuters_test.csv'
         })
         nlp_auger = NLPAugment(device='cuda:0')
-        nlp_auger.generate_augmented_data(dst['train'], save_path=DATA_POOL_PATH+'reuters/pool.csv',
+        nlp_auger.generate_augmented_data(dst['train'], save_path=DATA_POOL_PATH+'pool.csv',
                                           multi_aug_p=True)
 
     generate_reuters_data_main()

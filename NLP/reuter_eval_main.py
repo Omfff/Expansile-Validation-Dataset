@@ -15,8 +15,8 @@ from args import get_args
 from utils import PathConfig, generate_seed_set
 
 
-FE_SAVE_PATH = PathConfig().get_fe_path()
-DATA_POOL_PATH = PathConfig().get_data_pool_path()
+FE_SAVE_PATH = PathConfig().get_reuters_fe_path()
+DATA_POOL_PATH = PathConfig().get_reuters_data_pool_path()
 
 args = get_args()
 print(args)
@@ -72,7 +72,7 @@ def one_round_training(seed):
                                          try_num_limits=150,
                                          add_num_decay_rate=0.5, add_num_decay_method='triggered', add_num_decay_stage=None,
                                          random_seed=data_extender_seeds[i])
-            data_extender.generate_data_to_pool(DATA_POOL_PATH+'reuters/pool.csv', post_process, model_name)
+            data_extender.generate_data_to_pool(DATA_POOL_PATH+'pool.csv', post_process, model_name)
             train_dst, val_dst = data_extender.run(ignore_feature_distance=args.ignore_fdd)
 
         setup_seed(42)

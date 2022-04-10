@@ -17,6 +17,8 @@ from feature_distribution import FeatureDistribution, FeatureExtractorType, Feat
 from data_extender import DataExtender
 from feature_extractor import load_feature_extractor
 import yaml
+from utils import generate_seed_set
+
 
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
@@ -141,8 +143,7 @@ def one_round_training(seed):
 
 def Kfold_cross_validation():
     import numpy as np
-    np.random.seed(0)  # 0
-    seed_set = np.random.randint(0, 10000, size=10).tolist()
+    seed_set = generate_seed_set()
     val_performance_list = []
     test_performance_list = []
     performance_bias_list = []

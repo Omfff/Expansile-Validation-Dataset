@@ -1,10 +1,13 @@
-import torch
 import torchvision
 import torchvision.transforms as transforms
 import numpy as np
 from torch.utils.data import Dataset
 import os
 from PIL import Image
+from utils import PathConfig
+
+PC = PathConfig()
+
 
 normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
                                  std=[0.2023, 0.1994, 0.2010])
@@ -128,83 +131,6 @@ class IMBALANCECIFAR10(torchvision.datasets.CIFAR10):
             cls_num_list.append(self.num_per_cls_dict[i])
         return cls_num_list
 
-# class IMBALANCECIFAR10(torchvision.datasets.CIFAR10):
-#     cls_num = 10
-#
-#     def __init__(self, root, imb_type='exp', imb_factor=0.01, rand_number=0, train=True,
-#                  transform=None, target_transform=None,
-#                  download=False):
-#         super(IMBALANCECIFAR10, self).__init__(root, train, transform, target_transform, download)
-#         # np.random.seed(rand_number)
-#         img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
-#         self.gen_imbalanced_data(img_num_list)
-#
-#     def get_img_num_per_cls(self, cls_num, imb_type, imb_factor):
-#         img_max = len(self.data) / cls_num
-#         img_num_per_cls = []
-#         if imb_type == 'exp':
-#             for cls_idx in range(cls_num):
-#                 num = img_max * (imb_factor ** (cls_idx / (cls_num - 1.0)))
-#                 img_num_per_cls.append(int(num))
-#         elif imb_type == 'step':
-#             for cls_idx in range(cls_num // 2):
-#                 img_num_per_cls.append(int(img_max))
-#             for cls_idx in range(cls_num // 2):
-#                 img_num_per_cls.append(int(img_max * imb_factor))
-#         else:
-#             img_num_per_cls.extend([int(img_max)] * cls_num)
-#         return img_num_per_cls
-#
-#     def gen_imbalanced_data(self, img_num_per_cls):
-#         new_data = []
-#         new_targets = []
-#         targets_np = np.array(self.targets, dtype=np.int64)
-#         classes = np.unique(targets_np)
-#         # np.random.shuffle(classes)
-#
-#         self.num_per_cls_dict = dict()
-#         for the_class, the_img_num in zip(classes, img_num_per_cls):
-#             self.num_per_cls_dict[the_class] = the_img_num
-#             idx = np.where(targets_np == the_class)[0]
-#             # np.random.seed(0)
-#             np.random.shuffle(idx)
-#             selec_idx = idx[:the_img_num]
-#             # print(selec_idx)
-#             new_data.append(self.data[selec_idx, ...])
-#             new_targets.extend([the_class, ] * the_img_num)
-#         new_data = np.vstack(new_data)
-#         self.data = new_data
-#         self.targets = np.asarray(new_targets, dtype=int)
-#
-#     def get_cls_num_list(self):
-#         cls_num_list = []
-#         for i in range(self.cls_num):
-#             cls_num_list.append(self.num_per_cls_dict[i])
-#         return cls_num_list
-
-
-# class IMBALANCECIFAR100(IMBALANCECIFAR10):
-#     """`CIFAR100 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ Dataset.
-#     This is a subclass of the `CIFAR10` Dataset.
-#     """
-#     base_folder = 'cifar-100-python'
-#     url = "https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
-#     filename = "cifar-100-python.tar.gz"
-#     tgz_md5 = 'eb9058c3a382ffc7106e4002c42a8d85'
-#     train_list = [
-#         ['train', '16019d7e3df5f24257cddd939b257f8d'],
-#     ]
-#
-#     test_list = [
-#         ['test', 'f0ef6b0ae62326f3e7ffdfab6717acfc'],
-#     ]
-#     meta = {
-#         'filename': 'meta',
-#         'key': 'fine_label_names',
-#         'md5': '7973b15100ade9c7d40fb424638fde48',
-#     }
-#     cls_num = 100
-
 
 class DatasetWrapper(Dataset):
     def __init__(self, dataset, indexset:list=None, transform:transforms=None, return_index=False):
@@ -314,26 +240,26 @@ def get_dataset(dst_name, split=None, index=None):
 
     if dst_name == 'im_cifar10':
         if split == 'train':
-            dst = IMBALANCECIFAR10(root='/data/omf/dataset/torch/', indexes_path='./data_indexes/cifar10_train_indexes_1p.txt',
+            dst = IMBALANCECIFAR10(root=PC.get_cifar10_dataset_path(),
+                                   indexes_path=PC.get_cifar10_index_path()+'cifar10_train_indexes_1p.txt',
                      train=True, download=True)
         else:
-            # dst = torchvision.datasets.CIFAR10(root='/data/omf/dataset/torch/', train=False,
-            #                             download=True)
-            dst = IMBALANCECIFAR10(root='/data/omf/dataset/torch/', indexes_path='./data_indexes/cifar10_test_indexes_1p.txt',
+            dst = IMBALANCECIFAR10(root=PC.get_cifar10_dataset_path(),
+                                   indexes_path=PC.get_cifar10_index_path()+'cifar10_test_indexes_1p.txt',
                            train=False, download=True)
     elif dst_name == 'aug_cifar10':
-        dst = AugmentedDataset(file_path='/ssd1/omf/datasets/cifar10_pool/')
+        dst = AugmentedDataset(file_path=PC.get_cifar10_data_pool_path())
         print(len(dst))
     elif dst_name == 'coreset_cifar10':
-        dst_indexes = np.loadtxt('data_indexes/cifar10_1p_valset_100p'+str(index)+'.txt')
+        dst_indexes = np.loadtxt(PC.get_cifar10_index_path()+'cifar10_1p_valset_100p'+str(index)+'.txt')
         dst_indexes = dst_indexes.astype(dtype=int)
-        augment_dst = DatasetWrapper(AugmentedDataset(file_path='/ssd1/omf/datasets/cifar10_pool/'))
+        augment_dst = DatasetWrapper(AugmentedDataset(file_path=PC.get_cifar10_data_pool_path()))
         dst = augment_dst.get_dataset_by_indexes(dst_indexes)
         del augment_dst
     elif dst_name == 'byorder_valset_cifar10':
-        dst_indexes = np.loadtxt('data_indexes/byorder/cifar10_1p_valset_100p'+str(index)+'.txt')
+        dst_indexes = np.loadtxt(PC.get_cifar10_index_path()+'byorder/cifar10_1p_valset_100p'+str(index)+'.txt')
         dst_indexes = dst_indexes.astype(dtype=int)
-        augment_dst = DatasetWrapper(AugmentedDataset(file_path='/ssd1/omf/datasets/cifar10_pool/'))
+        augment_dst = DatasetWrapper(AugmentedDataset(file_path=PC.get_cifar10_data_pool_path()))
         dst = augment_dst.get_dataset_by_indexes(dst_indexes)
         del augment_dst
     dst = DatasetWrapper(dst)
@@ -341,20 +267,8 @@ def get_dataset(dst_name, split=None, index=None):
 
 
 if __name__ == '__main__':
-    # generator = IMBALANCECIFAR10Generator(root='/data/omf/dataset/torch/', train=True,
-    #                        download=True, imb_factor=0.01)
-    # generator.save_index_list(path='./data_indexes/cifar10_train_indexes_1p.txt')
+    generator = IMBALANCECIFAR10Generator(root=PC.get_cifar10_dataset_path(), train=True, download=True, imb_factor=0.01)
+    generator.save_index_list(path=PC.get_cifar10_index_path()+'cifar10_train_indexes_1p.txt')
 
-    # generator = IMBALANCECIFAR10Generator(root='/data/omf/dataset/torch/', train=False,
-    #                                       download=True, imb_factor=0.01)
-    # generator.save_index_list(path='./data_indexes/cifar10_test_indexes_1p.txt')
-
-    dst1 = IMBALANCECIFAR10(root='/data/omf/dataset/torch/', indexes_path='./data_indexes/cifar10_train_indexes_1p.txt',
-                     train=True, download=True)
-    print(dst1.get_cls_num_list())
-
-    dst2 = IMBALANCECIFAR10(root='/data/omf/dataset/torch/', indexes_path='./data_indexes/cifar10_test_indexes_1p.txt',
-                           train=False, download=True)
-    print(dst2.get_cls_num_list())
-
-    print(np.sum(dst1.get_cls_num_list())+ np.sum(dst2.get_cls_num_list()))
+    generator = IMBALANCECIFAR10Generator(root=PC.get_cifar10_dataset_path(), train=False, download=True, imb_factor=0.01)
+    generator.save_index_list(path=PC.get_cifar10_index_path()+'cifar10_test_indexes_1p.txt')

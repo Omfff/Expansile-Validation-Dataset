@@ -1,10 +1,8 @@
 
 import os
-import shutil
 import time
 
 import torch
-import torch.nn as nn
 import torch.nn.parallel
 
 import torch.optim
