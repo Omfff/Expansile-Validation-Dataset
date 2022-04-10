@@ -75,20 +75,11 @@ class DataGenerator(object):
         return merged_set.drop(['label'], axis=1), merged_set['label']
 
     def generate_data_to_pool(self, method):
-        """
+        """ Generate auxiliary dataset
 
-        :param dst:
         :param method: RS|SMOTE|mixup
-        :return:
+        :return: auxiliary dataset
         """
-        # class_sample_index_dict = {}
-        # for i in range(len(self.init_val_set[1])):
-        #     label = self.init_val_set[1].loc[i]
-        #     if label not in class_sample_index_dict.keys():
-        #         class_sample_index_dict[label] = []
-        #     class_sample_index_dict[label].append(i)
-        # for label, indexes in class_sample_index_dict:
-        #     self.add_num_per_iter[label] = int(len(indexes) * self.add_ratio)
         np.random.seed(self.random_seed)
         if method == 'SMOTE':
             cf_converter = CategoricalFeatureConverter(self.categorical_col)
@@ -103,11 +94,8 @@ class DataGenerator(object):
                                                        replace=True, random_state=self.random_seed).values
             elif method == 'SMOTE':
                 samples = samples.drop(['label'], axis=1).values
-                # 获取每一个少数类样本点周围最近的n_neighbors-1个点的位置矩阵
                 nns = NearestNeighbors(n_neighbors=5).fit(samples).kneighbors(samples, return_distance=False)[:, 1:]
-                # 随机产生diff个随机数作为之后产生新样本的选取的样本下标值
                 samples_indices = np.random.randint(low=0, high=np.shape(samples)[0], size=expand_size)
-                # 随机产生diff个随机数作为之后产生新样本的间距值
                 steps = np.random.uniform(size=expand_size)
                 cols = np.mod(samples_indices, nns.shape[1])
                 expand_samples = np.zeros((expand_size, samples.shape[1]))

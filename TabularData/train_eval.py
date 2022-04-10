@@ -9,11 +9,20 @@ import numpy as np
 from feature_distribution import FeatureDistribution,FeatureType
 from augmentation import DataGenerator
 from data_extender import DataExtender
-from util import merge_dict, normalize_features, cal_value_list, print_result
+from util import merge_dict, print_result
 from coreset import CoresetSampler, RandomCoresetSampler
 
 
 def train(cfg, seed_set, train_set, test_set, feature_cols:FeatureType, label_list):
+    """ Multiple rounds of training and collect the results of each training round
+
+    :param cfg: config object
+    :param seed_set: list of random seeds
+    :param train_set: whole train set
+    :param feature_cols:
+    :param label_list: list of category ([0,1,...]
+    :return: results which contain f1, bias and variance
+    """
     perf_dict = {
         'val_f1_score_mean': [],
         'val_auc_mean': [],
@@ -74,10 +83,11 @@ def train(cfg, seed_set, train_set, test_set, feature_cols:FeatureType, label_li
 
 
 def one_round_training(cfg, seed, train_set, test_set, feature_cols:FeatureType, label_list):
+    """ One round training
+    """
     f_count = 0
     feature_dis = {}
     model = cfg['model']
-    test_set_copy = copy.deepcopy(test_set)
 
     train_set = (train_set[0].reset_index(drop=True), train_set[1].reset_index(drop=True))
 
@@ -158,13 +168,6 @@ def one_round_training(cfg, seed, train_set, test_set, feature_cols:FeatureType,
                 (x_train, y_train), (x_val, y_val) = aug_set.run(sample_method=cfg['aug_sample_method'])
         else:
             (x_train, y_train), (x_val, y_val)= init_train_set, init_val_set
-
-        if cfg['model'] == 'lr':
-            value_list = cal_value_list(x_train, feature_cols.get_categorical_cols())
-            x_train = normalize_features(feature_cols, x_train, value_list)
-            x_val = normalize_features(feature_cols, x_val, value_list)
-            x_test = normalize_features(feature_cols, test_set_copy[0], value_list)
-            test_set = (x_test, test_set[1])
 
         print('train set shape', len(x_train))
         print('val set shape', len(x_val))

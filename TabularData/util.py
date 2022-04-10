@@ -6,11 +6,22 @@ from args import complete_cfg_by_args
 
 
 def read_data(file_path, delimiter=None):
+    """ Read dataset in csv form
+    :param file_path: dataset file path
+    :param delimiter:
+    :return: Dataframe
+    """
     data = pd.read_csv(file_path, delimiter=delimiter)
     return data
 
 
 def read_config(cfg_path, args):
+    """ Load config file
+
+    :param cfg_path: file path
+    :param args:
+    :return: config
+    """
     with open(cfg_path, 'r') as f:
         cfg = yaml.safe_load(f)
         cfg = complete_cfg_by_args(cfg, args)
@@ -19,6 +30,10 @@ def read_config(cfg_path, args):
 
 
 def check_data(data):
+    """  General inspection of the data.
+    :param data:
+    :return: None
+    """
     print(data.shape)
     print(data.head())
     print(data.isnull().sum())
@@ -29,6 +44,12 @@ def check_data(data):
 
 
 def split_labels(dst, y_name:str):
+    """ Split dataset into data(x) and label(y)
+
+    :param dst: dataset
+    :param y_name: column name of label
+    :return: datas of dst, labels of dst
+    """
     check_data(dst)
     dst_x = dst.drop([y_name], axis=1)
     dst_y = dst[y_name]
@@ -38,19 +59,23 @@ def split_labels(dst, y_name:str):
 
 
 def generate_seed_set():
+    """ Generate 100 random seeds
+
+    :return: list contains 100 seeds
+    """
     np.random.seed(0)
     seed_set = np.random.randint(0, 10000, size=100).tolist()
     return seed_set
 
 
 def adjust_dataset_size(dst:DataFrame, action_type, y_name, sample_rate=None, unbalanced_ratio=None):
-    """
+    """ adjust the number of samples in a dataset
 
     :param action_type: 1 sample instance in each class by 'sample_rate'
                         2 fix number of instance in negative class, and down sample positive class by unbalanced ratio
                         3 fix number of instance in positive class, and down sample negtive class by unbalanced ratio
                         4 fix number of instance in negative class, and up sample positive class by unbalanced ratio
-    :return:
+    :return: Adjusted dataset
     """
     np.random.seed(seed=2)
     def sampling(group, class_dict):
@@ -80,34 +105,7 @@ def adjust_dataset_size(dst:DataFrame, action_type, y_name, sample_rate=None, un
     print('='*80)
     dst.index = dst.index.droplevel()
     print(dst[y_name].value_counts())
-
-
     # dst = sklearn.utils.shuffle(dst)
-    return dst
-
-
-def cal_value_list(dst:DataFrame, categorical_cols):
-    value_list=None
-    if len(categorical_cols) > 0:
-        value_list = dst[categorical_cols].max().values.tolist()
-    return value_list
-
-
-def normalize_features(feature_types, dst, value_list=None):
-    z_scaler = lambda x: (x - np.mean(x)) / np.std(x)
-    for col in feature_types.get_oridinal_cols():
-        dst[col] = dst[[col]].apply(z_scaler)
-
-    for col in feature_types.get_categorical_cols():
-        dst[col] = dst[[col]].apply(z_scaler)
-
-    for col in feature_types.get_numerical_cols():
-        dst[col] = dst[[col]].apply(z_scaler)
-
-    # if len(feature_types.get_categorical_cols()) > 0 and value_list is not None:
-    #     # dst = pd.get_dummies(dst, columns=feature_types.get_categorical_cols())
-    #     enc = ColumnTransformer([('ct', OneHotEncoder(categories=[range(v+1) for v in value_list], handle_unknown='ignore'), feature_types.get_categorical_cols())], remainder='passthrough')
-    #     dst = pd.DataFrame(enc.fit_transform(dst).toarray())
     return dst
 
 

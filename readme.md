@@ -43,6 +43,7 @@ To get the results in the paper, run following commands:
 ./run_all_xgb_coreset.sh
 
 # configure the same path as the two above at the beginning of the file
+# then run the command to get the statistics in all Tables 
 python record.py
 ```
 
