@@ -8,7 +8,7 @@ def mkdir(path):
     path=path.rstrip("\\")
     isExists=os.path.exists(path)
     if not isExists:
-        os.makedirs(path.decode('utf-8'))
+        os.makedirs(path)
         print(path+' create success!')
         return True
     else:
@@ -21,7 +21,6 @@ class PathConfig(object):
         cfg_path = "path_config.yaml"
         with open(cfg_path, 'r') as f:
             cfg = yaml.safe_load(f)
-            print(cfg)
         self.cfg = cfg
 
     def get_dataset_path(self):
@@ -43,7 +42,7 @@ class PathConfig(object):
         return self.get_data_pool_path() + 'cifar10_pool/'
 
     def get_cifar10_fe_path(self):
-        self.get_fe_path()
+        return self.get_fe_path()
 
 
 def generate_seed_set():

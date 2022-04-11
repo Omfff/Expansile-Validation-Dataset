@@ -345,6 +345,6 @@ if __name__ == '__main__':
     transform = transforms.Compose([transforms.ToTensor()])
     trainset = get_dataset(dst_name='im_cifar10', split='train')
     trainset.update_transform(transform)
-    augmentor = CVAugment(device='cuda:0')
+    augmentor = CVAugment(device='cpu')
     augmentor.generate_augmented_data(trainset, save_path=PC.get_cifar10_data_pool_path())
 

@@ -1,5 +1,4 @@
 from torch.utils.data import DataLoader
-from chamferdist import ChamferDistance
 from enum import Enum
 import torch
 from ndb import NDB
@@ -44,8 +43,6 @@ class FeatureDistribution(object):
             self.dis_calculator = {}
             for l in labels:
                 self.dis_calculator[l] = None
-        elif dis_type == 'CD':
-            self.dis_calculator = ChamferDistance()
 
     def cal_class_distribution(self, class_x_set, bs=64):
         loader = DataLoader(class_x_set, batch_size=bs)

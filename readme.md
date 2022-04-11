@@ -47,7 +47,7 @@ python reuters.py
 # Change the path of models in nlpaug to your local path, and run
 CUDA_VISIBLE_DEVICES=0 python augmentation.py
 
-# To obtain feature extractor, run
+# To obtain feature extractor, run (download models from https://huggingface.co/models if some caching errors occur)
 CUDA_VISIBLE_DEVICES=0 python feature_extractor.py
 
 # To obtain initial val-set by coreset operation, run
@@ -60,7 +60,7 @@ Due to the large file size of the image dataset, we here only provide the comman
 
 ```shell
 # Configure the path_config.yaml, to create configured path, run:
-python untils.py
+python utils.py
 
 # Generate cifar10-longtail
 python imbalanced_dataset.py
@@ -68,11 +68,11 @@ python imbalanced_dataset.py
 # To generate auxiliary dataset
 python augmentation.py
 
-# To obtain feature extractor, run
+# To obtain feature extractor, run 
 CUDA_VISIBLE_DEVICES=0 python feature_extractor.py
 
 # To obtain initial val-set by coreset operation, run
-CUDA_VISIBLE_DEVICES=0 python samply.py
+CUDA_VISIBLE_DEVICES=0 python sample.py
 ```
 
 
@@ -159,10 +159,6 @@ CUDA_VISIBLE_DEVICES=0 python cifar10_eval_main.py -vm aug_kfold --k 5 --feature
 ```
 
 
-
-## Contributing
-
->📋  Pick a licence and describe how to contribute to your code repository. 
 
 
 

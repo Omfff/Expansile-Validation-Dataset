@@ -9,7 +9,7 @@ def mkdir(path):
     path=path.rstrip("\\")
     isExists=os.path.exists(path)
     if not isExists:
-        os.makedirs(path.decode('utf-8'))
+        os.makedirs(path)
         print(path+' create success!')
         return True
     else:
@@ -36,7 +36,6 @@ class PathConfig(object):
         cfg_path = "path_config.yaml"
         with open(cfg_path, 'r') as f:
             cfg = yaml.safe_load(f)
-            print(cfg)
         self.cfg = cfg
 
     def get_dataset_path(self):

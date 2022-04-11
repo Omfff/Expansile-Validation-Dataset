@@ -41,7 +41,7 @@ def get_cifar10_args(model_names):
     parser.add_argument('--J', type=int, default=1, required=False)
     parser.add_argument('--k', type=int, required=True)
     parser.add_argument('--fe_type',  type=str, choices=['fine-tune', 'pre-train'], default='fine-tune')
-    parser.add_argument('--feature_dis_type', type=str, choices=['CD', 'NDB'], required=False)
+    parser.add_argument('--feature_dis_type', type=str, choices=['NDB'], required=False)
     parser.add_argument('--ignore_fdd', dest='ignore_fdd', action='store_true')
     parser.add_argument('--save_name', type=str, required=False)
     parser.add_argument('--config_path', type=str, required=False, default='./config/cifar10_default.yaml')

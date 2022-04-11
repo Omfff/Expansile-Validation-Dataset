@@ -254,6 +254,7 @@ def get_dataset(dst_name, split=None, index=None):
         dst_indexes = np.loadtxt(PC.get_cifar10_index_path()+'cifar10_1p_valset_100p'+str(index)+'.txt')
         dst_indexes = dst_indexes.astype(dtype=int)
         augment_dst = DatasetWrapper(AugmentedDataset(file_path=PC.get_cifar10_data_pool_path()))
+        print(len(augment_dst))
         dst = augment_dst.get_dataset_by_indexes(dst_indexes)
         del augment_dst
     elif dst_name == 'byorder_valset_cifar10':

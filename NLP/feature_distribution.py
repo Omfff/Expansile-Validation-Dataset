@@ -1,7 +1,6 @@
 from transformers import AutoModelForSequenceClassification
 from transformers import BertModel,BertTokenizer
 from torch.utils.data import DataLoader
-from chamferdist import ChamferDistance
 from enum import Enum
 import torch
 from ndb import NDB
@@ -27,8 +26,6 @@ class FeatureDistribution(object):
             self.dis_calculator = {}
             for l in labels:
                 self.dis_calculator[l] = None
-        elif dis_type == 'CD':
-            self.dis_calculator = ChamferDistance()
 
     def cal_class_distribution(self, class_x_set, bs=64):
         loader = DataLoader(class_x_set, batch_size=bs)
@@ -76,26 +73,6 @@ class FeatureDistribution(object):
         f2 = self.cal_distribution(x2, y2)
         dis = self.cal_distribution_diff(f1, f2)
         return dis
-
-
-def FD_test():
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    inputs0 = tokenizer(['Love me once more', "Hello, my dog is cute", "Hey, your father is sick"],
-                        padding=True, truncation=True, max_length=None, return_tensors="pt")
-    # "Hey, your puppies are very beautiful"
-    inputs1 = tokenizer(["Hello, my dog is cute", 'Love me once more', "Hey, your father is sick"],
-                        padding=True, truncation=True, max_length=None, return_tensors="pt")
-
-    feature_extractor0 = BertModel.from_pretrained('bert-base-uncased')
-    outputs0 = torch.mean(feature_extractor0(**inputs0).last_hidden_state, dim=1).unsqueeze(dim=0)
-    outputs1 = torch.mean(feature_extractor0(**inputs1).last_hidden_state, dim=1).unsqueeze(dim=0)
-    chamferDist = ChamferDistance()
-    print(outputs0.shape)
-    print(outputs1.shape)
-    print(chamferDist(outputs0, outputs1, bidirectional=False))
-    feature_extractor1 = AutoModelForSequenceClassification.from_pretrained('./feature_extractor/reuter_fe', output_hidden_states=True)
-    out0 = torch.mean(feature_extractor1(**inputs0).hidden_states[-2], dim=1)
-    print(out0)
 
 
 def ndb_test():
