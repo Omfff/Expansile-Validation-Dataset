@@ -2,8 +2,6 @@
 
 This repository is the official implementation of [Expansile Validation Dataset (EVD): Towards Resolving The Train/Validation Split Tradeoff](). 
 
->📋  Optional: include a graphic explaining your approach/main result, bibtex entry, link to demos, blog posts and tutorials
-
 <img src="https://tva1.sinaimg.cn/large/e6c9d24ely1h10c79lniuj20k10c0wfm.jpg" alt="image-20220406214255058" style="zoom:80%;" />
 
 ## Requirements
@@ -16,7 +14,7 @@ pip install -r requirements.txt
 
 
 
-## Flow of the Code
+## Code Explanation
 
 Each folder contains four core files(ie., `augmentation.py`, `sample.py`, `data_extender.py`, `feature_distribution.py`), the logical role of the files with the same name under different folders are the same, but they are implemented differently due to the different types of data they act on.  The role of each file is explained below:
 
@@ -47,7 +45,7 @@ python reuters.py
 # Change the path of models in nlpaug to your local path, and run
 CUDA_VISIBLE_DEVICES=0 python augmentation.py
 
-# To obtain feature extractor, run (download models from https://huggingface.co/models if some caching errors occur)
+# To obtain feature extractor, run (download pretrained models from https://huggingface.co/models if some caching errors occur)
 CUDA_VISIBLE_DEVICES=0 python feature_extractor.py
 
 # To obtain initial val-set by coreset operation, run
