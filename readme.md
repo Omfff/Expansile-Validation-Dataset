@@ -1,6 +1,6 @@
 # Expansile Validation Dataset (EVD): Towards Resolving The Train/Validation Split Tradeoff
 
-This repository is the official implementation of [Expansile Validation Dataset (EVD): Towards Resolving The Train/Validation Split Tradeoff](Expansile Validation Dataset——Towards Resolving The Train-Validation Split Tradeoff.pdf). 
+This repository is the official implementation of [Expansile Validation Dataset (EVD): Towards Resolving The Train/Validation Split Tradeoff](Expansile_Validation_Dataset_Towards_Resolving_The_Train-Validation_split_Tradeoff.pdf). 
 
 <img src="https://tva1.sinaimg.cn/large/e6c9d24ely1h10c79lniuj20k10c0wfm.jpg" alt="image-20220406214255058" style="zoom:80%;" />
 
